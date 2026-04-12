@@ -193,6 +193,20 @@ function syncVisualEffects(): void {
   }
 };
 
+// ── Seek within current song (seconds) ───────────────────────
+(window as any).seekForward = (seconds: number = 10): void => {
+  const current = engine.getCurrentTime();
+  const duration = engine.getDuration();
+  if (duration && duration !== Infinity) {
+    engine.seek(Math.min(current + seconds, duration));
+  }
+};
+
+(window as any).seekBackward = (seconds: number = 10): void => {
+  const current = engine.getCurrentTime();
+  engine.seek(Math.max(current - seconds, 0));
+};
+
 // ── Volume controls ──────────────────────────────────────────
 (window as any).volumeUp = (): void => { vol.volumeUp(10); renderVol(); };
 (window as any).volumeDown = (): void => { vol.volumeDown(10); renderVol(); };
@@ -339,9 +353,13 @@ function rgbToHex(r: number, g: number, b: number) {
 window.addEventListener("keydown", (e) => {
   if (e.target instanceof HTMLInputElement) return; // Don't interfere with inputs
   if (e.code === "Space") { e.preventDefault(); (window as any).togglePlay(); }
-  if (e.code === "ArrowRight") { e.preventDefault(); (window as any).nextSong(); }
-  if (e.code === "ArrowLeft") { e.preventDefault(); (window as any).prevSong(); }
-  if (e.code === "ArrowUp") { e.preventDefault(); (window as any).volumeUp(); }
+  // Shift + Arrow → seek ±10s within current song
+  if (e.code === "ArrowRight" && e.shiftKey) { e.preventDefault(); (window as any).seekForward(10); }
+  else if (e.code === "ArrowLeft" && e.shiftKey) { e.preventDefault(); (window as any).seekBackward(10); }
+  // Plain Arrow → change song
+  else if (e.code === "ArrowRight") { e.preventDefault(); (window as any).nextSong(); }
+  else if (e.code === "ArrowLeft")  { e.preventDefault(); (window as any).prevSong(); }
+  if (e.code === "ArrowUp")   { e.preventDefault(); (window as any).volumeUp(); }
   if (e.code === "ArrowDown") { e.preventDefault(); (window as any).volumeDown(); }
 });
 

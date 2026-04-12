@@ -306,6 +306,16 @@ body.is-playing .ctrl-play { animation: playBtnPulse 2s ease-in-out infinite; }
   50%      { box-shadow: 0 4px 40px rgba(167,139,250,.65), 0 0 20px rgba(244,114,182,.4); }
 }
 
+/* Seek ±10s buttons */
+.ctrl-seek {
+  display: flex; align-items: center; gap: 2px;
+  font-family: var(--fm); width: auto !important; padding: 0 6px;
+  opacity: 0.75; transition: all .2s;
+}
+.ctrl-seek:hover { opacity: 1; color: var(--accent) !important; transform: scale(1.1); }
+.ctrl-seek:active { transform: scale(.93); }
+.seek-label { font-size: .62rem; font-weight: 700; line-height: 1; }
+
 /* Volume */
 .volume-block {
   background: var(--s2); border: 1px solid var(--border);
