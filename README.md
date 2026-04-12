@@ -86,7 +86,7 @@ Luego abre `http://localhost:5173` en tu navegador.
 
 ---
 
-## 🛠️ Tecnologías Utilizadas
+##  Tecnologías Utilizadas
 
 | Tecnología | Uso |
 |------------|-----|
