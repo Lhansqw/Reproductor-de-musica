@@ -13,12 +13,12 @@ export class VolumeController {
   }
 
   // ── Getters ─────────────────────────────────────────────
-  /** Volumen efectivo (0 si muted) */
+  /** Effective volume (0 if muted) */
   get volume(): number {
     return this._muted ? 0 : this._volume;
   }
 
-  /** Valor crudo del slider (ignora mute) */
+  /** Raw slider value (ignores mute) */
   get rawVolume(): number {
     return this._volume;
   }
@@ -52,7 +52,7 @@ export class VolumeController {
     }
   }
 
-  // ── Utilidad UI ─────────────────────────────────────────
+  // ── UI Utility ──────────────────────────────────────────
   getIcon(): VolumeIcon {
     if (this._muted || this._volume === 0) return "mute";
     if (this._volume < 33) return "low";

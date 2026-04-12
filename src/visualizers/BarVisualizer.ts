@@ -1,7 +1,7 @@
 // src/visualizers/BarVisualizer.ts
 //
-// Visualizador de barras para el sidebar.
-// Simula datos de audio con ruido suavizado y anima con requestAnimationFrame.
+// Bar visualizer for the sidebar.
+// Simulates audio data with smoothed noise and animates using requestAnimationFrame.
 
 export class BarVisualizer {
   private canvas: HTMLCanvasElement;
@@ -41,18 +41,18 @@ export class BarVisualizer {
     }
     
     const freqData = this.engine.getFrequencyData();
-    // Tenemos 128 bins, queremos mapearlos a nuestras `this.bars` (por ej. 28)
+    // We have 128 bins, we want to map them to our `this.bars` (e.g., 28)
     const step = Math.floor(freqData.length / this.bars) || 1;
 
     this.targets = this.targets.map((_, i) => {
-      // Tomamos un promedio de frecuencias para cada barra
+      // Take an average of frequencies for each bar
       let sum = 0;
       for (let j = 0; j < step; j++) {
         const index = i * step + j;
         if (index < freqData.length) sum += freqData[index];
       }
       const avg = sum / step;
-      return avg / 255.0; // Normalizar entre 0 y 1
+      return avg / 255.0; // Normalize between 0 and 1
     });
   }
 
@@ -60,7 +60,7 @@ export class BarVisualizer {
     this.resize();
     this.updateTargets();
 
-    // Suavizado exponencial
+    // Exponential smoothing
     this.data = this.data.map((v, i) => v + (this.targets[i] - v) * 0.15);
 
     const { width: w, height: h } = this.canvas;
@@ -75,7 +75,7 @@ export class BarVisualizer {
       const y = h - bh;
       const t = i / this.bars;
 
-      // Degradado violeta → rosa
+      // Violet → pink gradient
       const r = Math.round(167 + (244 - 167) * t);
       const g = Math.round(139 + (114 - 139) * t);
       const b = Math.round(250 + (182 - 250) * t);
@@ -86,7 +86,7 @@ export class BarVisualizer {
       this.ctx.roundRect(x, y, bw, bh, radius);
       this.ctx.fill();
 
-      // Brillo en el tope de la barra
+      // Glow at the top of the bar
       if (v > 0.3) {
         this.ctx.fillStyle = `rgba(255,255,255,${v * 0.3})`;
         this.ctx.fillRect(x, y, bw, 2);

@@ -1,7 +1,7 @@
 // src/visualizers/ParticleSystem.ts
 //
-// Sistema de partículas flotantes sobre el fondo.
-// Las partículas se aceleran y pulsan cuando está reproduciendo.
+// Floating particle system for the background.
+// Particles accelerate and pulse when playing.
 
 interface ParticleOptions {
   count?: number;
@@ -48,7 +48,7 @@ class Particle {
 
   update(playing: boolean, bassEnergy: number): void {
     this.pulse += this.pulseSpeed + bassEnergy * 0.1;
-    // bassEnergy va de 0 a 1. Amplificamos la velocidad si hay bajo.
+    // bassEnergy goes from 0 to 1. Amplify speed if there is bass.
     const energyBoost = playing ? (1 + bassEnergy * 4) : 0.5;
     const speed = playing ? (1.8 * energyBoost) : 0.6;
     this.x += this.speedX * (playing ? (1.5 + bassEnergy) : 0.5);
@@ -58,12 +58,12 @@ class Particle {
   }
 
   draw(ctx: CanvasRenderingContext2D, playing: boolean, bassEnergy: number): void {
-    // Aumentamos el tamaño si hay bajo
+    // Increase size if there is bass
     const s =
       this.size * (1 + Math.sin(this.pulse) * 0.3 * (playing ? 1 : 0.2)) + bassEnergy * 2;
     ctx.beginPath();
     ctx.arc(this.x, this.y, s, 0, Math.PI * 2);
-    // Cambiamos opacidad con la energía
+    // Change opacity based on energy
     const alpha = Math.min(1, this.life * 0.6 + bassEnergy * 0.4);
     ctx.fillStyle = this.color + alpha + ")";
     ctx.fill();

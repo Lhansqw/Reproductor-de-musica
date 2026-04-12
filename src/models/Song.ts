@@ -4,7 +4,7 @@ export interface Song {
   id: number;
   title: string;
   artist: string;
-  duration: string; // formato "m:ss"
-  audioUrl?: string; // URL del archivo de audio real
-  file?: File; // Instancia real para extraer ID3
+  duration: string; // duration format "m:ss"
+  audioUrl?: string; // Real audio file URL
+  file?: File; // Real instance for extracting ID3
 }

@@ -9,12 +9,12 @@
 </head>
 <body>
 
-  <!-- Orbs de luz ambiental -->
+  <!-- Ambient light orbs -->
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="orb orb-3"></div>
 
-  <!-- Canvas partículas de fondo -->
+  <!-- Background particles canvas -->
   <canvas id="bg-canvas"></canvas>
 
   <!-- ======================= MODAL ======================= -->
@@ -55,7 +55,7 @@
   <!-- ======================= APP ========================= -->
   <div class="app">
 
-    <!-- ── SIDEBAR IZQUIERDO ──────────────────────────── -->
+    <!-- ── LEFT SIDEBAR ───────────────────────────────── -->
     <aside class="sidebar">
 
       <div class="logo">
@@ -86,7 +86,7 @@
         </div>
       </div>
 
-      <!-- Barra de progreso -->
+      <!-- Progress bar -->
       <div class="progress-wrap">
         <div class="progress-track" id="progress-track" onclick="seekSong(event)" style="cursor: pointer;">
           <div class="progress-fill" id="progress-fill"></div>
@@ -97,7 +97,7 @@
         </div>
       </div>
 
-      <!-- Controles de reproducción -->
+      <!-- Playback controls -->
       <div class="controls">
         <button class="ctrl" id="btn-shuffle" onclick="toggleShuffle()" title="Aleatorio (Shuffle)">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
@@ -117,7 +117,7 @@
         </button>
       </div>
 
-      <!-- Control de Volumen -->
+      <!-- Volume control -->
       <div class="volume-block">
         <div class="vol-header">
           <span class="vol-label-text">VOLUMEN</span>
@@ -134,17 +134,17 @@
 
 
 
-      <!-- Visualizador de barras (sidebar) -->
+      <!-- Bar visualizer (sidebar) -->
       <div class="viz-container">
         <canvas id="viz-canvas"></canvas>
       </div>
 
     </aside>
 
-    <!-- ── PANEL CENTRAL: Playlist ───────────────────── -->
+    <!-- ── CENTRAL PANEL: Playlist ────────────────────── -->
     <main class="main">
 
-      <!-- Ondas de fondo SVG -->
+      <!-- SVG background waves -->
       <div class="wave-bg">
         <svg viewBox="0 0 600 640" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -182,7 +182,7 @@
         </div>
       </div>
 
-      <!-- Visualizador Principal insertado al tope de Playlist -->
+      <!-- Main Visualizer inserted at the top of Playlist -->
       <div class="freq-visualizer">
         <canvas id="freq-canvas"></canvas>
       </div>
@@ -196,7 +196,7 @@
 
       <div class="song-list" id="song-list"></div>
 
-      <!-- Cola de Reproducción dentro del panel principal -->
+      <!-- Playback Queue inside the main panel -->
       <div class="main-header" style="padding-top: 10px; padding-bottom: 5px;">
         <div>
           <h2 class="main-title" style="font-size: 1.1rem; opacity: 0.8;">Siguientes en cola</h2>

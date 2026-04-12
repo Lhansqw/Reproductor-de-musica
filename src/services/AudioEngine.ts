@@ -7,13 +7,13 @@ export class AudioEngine {
   private source: MediaElementAudioSourceNode | null = null;
   private dataArray: Uint8Array = new Uint8Array(0);
 
-  // Eventos para UI
+  // UI Events
   public onTimeUpdate?: (currentTime: number, duration: number) => void;
   public onEnded?: () => void;
 
   constructor() {
     this.audio = new Audio();
-    this.audio.crossOrigin = "anonymous"; // Permite analizar fuentes externas si tienen CORS
+    this.audio.crossOrigin = "anonymous"; // Allows analyzing external sources if they have CORS
 
     this.audio.addEventListener("timeupdate", () => {
       if (this.onTimeUpdate) {
@@ -28,12 +28,12 @@ export class AudioEngine {
     });
   }
 
-  // Inicialización perezosa (requiere interacción del usuario)
+  // Lazy initialization (requires user interaction)
   private initContext() {
     if (!this.context) {
       this.context = new (window.AudioContext || (window as any).webkitAudioContext)();
       this.analyser = this.context.createAnalyser();
-      this.analyser.fftSize = 256; // 128 bins de frecuencia
+      this.analyser.fftSize = 256; // 128 frequency bins
       this.dataArray = new Uint8Array(this.analyser.frequencyBinCount);
 
       this.source = this.context.createMediaElementSource(this.audio);
@@ -41,7 +41,7 @@ export class AudioEngine {
       this.analyser.connect(this.context.destination);
     }
     
-    // Si el contexto web audio estaba suspendido, reiniciarlo
+    // If the web audio context was suspended, resume it
     if (this.context.state === "suspended") {
       this.context.resume();
     }
@@ -57,7 +57,7 @@ export class AudioEngine {
     try {
       await this.audio.play();
     } catch (e) {
-      console.warn("Falló la reproducción automática. Esperando interacción.", e);
+      console.warn("Autoplay failed. Waiting for interaction.", e);
     }
   }
 
@@ -89,9 +89,9 @@ export class AudioEngine {
     if (this.analyser && this.isPlaying) {
       this.analyser.getByteFrequencyData(this.dataArray);
     } else if (this.dataArray.length > 0) {
-      // Si está en pausa, rellenar de ceros gradualmente para un desvanecimiento suave (opcional)
-      // O simplemente mantener el dataArray en su último valor. 
-      // Por limpieza, retornamos un arreglo de 0s si no está reproduciendo
+      // If paused, gradually fill with zeros for a smooth fade (optional)
+      // Or simply keep dataArray at its last value. 
+      // For cleanliness, we return an array of 0s if not playing
       this.dataArray.fill(0);
     }
     return this.dataArray;
@@ -100,9 +100,9 @@ export class AudioEngine {
   public getBassEnergy(): number {
     if (!this.analyser || !this.isPlaying) return 0;
     this.analyser.getByteFrequencyData(this.dataArray);
-    // Tomar los primeros bins (bajos) para calcular la energía
+    // Take the first bins (bass) to calculate energy
     let sum = 0;
-    const bassBins = 4; // Los primeros bins suelen representar los bajos (<200Hz aprox)
+    const bassBins = 4; // The first bins usually represent bass (<200Hz approx)
     for (let i = 0; i < bassBins; i++) {
         sum += this.dataArray[i];
     }

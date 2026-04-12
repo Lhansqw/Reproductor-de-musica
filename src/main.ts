@@ -11,11 +11,11 @@ import jsmediatags from "jsmediatags/dist/jsmediatags.min.js";
 
 let searchFilter = "";
 
-// ── Instancias de servicios ──────────────────────────────────
+// ── Service instances ────────────────────────────────────────
 const playlist = new PlaylistService();
 const vol = new VolumeController(70);
 
-// ── Visualizadores ───────────────────────────────────────────
+// ── Visualizers ──────────────────────────────────────────────
 const barViz = new BarVisualizer("viz-canvas", 28);
 const freqViz = new FrequencyVisualizer("freq-canvas", 40);
 const particles = new ParticleSystem("bg-canvas", { count: 80 });
@@ -25,13 +25,13 @@ barViz.setAudioEngine(engine);
 freqViz.setAudioEngine(engine);
 particles.setAudioEngine(engine);
 
-// ── Estado del reproductor ───────────────────────────────────
+// ── Player state ─────────────────────────────────────────────
 let isPlaying = false;
 let progressSec = 0;
 let timerId: ReturnType<typeof setInterval> | null = null;
 const MAX_SEC = 210;
 
-// ── Canciones demo ───────────────────────────────────────────
+// ── Demo songs ───────────────────────────────────────────────
 const DEMO_URL_1 = "/demo1.mp3";
 const DEMO_URL_2 = "/demo2.mp3";
 const DEMO_URL_3 = "/demo3.mp3";
@@ -46,13 +46,13 @@ playlist.addLast("Heat Waves", "Glass Animals", "3:59");
 playlist.addLast("Flowers", "Miley Cyrus", "3:21");
 playlist.addLast("Unholy", "Sam Smith", "2:36");
 
-// ── Timer / Progreso ─────────────────────────────────────────
+// ── Timer / Progress ─────────────────────────────────────────
 engine.onTimeUpdate = (currentTime, duration) => {
   progressSec = currentTime;
   const fill = document.getElementById("progress-fill") as HTMLElement;
   const timeEl = document.getElementById("time-current") as HTMLElement;
   
-  // Asumiendo que `duration` es Infinity si no cargó, usamos porcentaje local
+  // Assuming `duration` is Infinity if not loaded, use local percentage
   const safeDur = duration || MAX_SEC;
   const pct = Math.min((currentTime / safeDur) * 100, 100);
   fill.style.width = pct + "%";
@@ -61,11 +61,11 @@ engine.onTimeUpdate = (currentTime, duration) => {
   const s = Math.floor(currentTime % 60);
   timeEl.textContent = `${m}:${s.toString().padStart(2, "0")}`;
   
-  // Actualizar también la duración total si es posible
+  // Also update total duration if possible
   if (duration && duration !== Infinity) {
     const dm = Math.floor(duration / 60);
     const ds = Math.floor(duration % 60);
-    const timeTotalEl = document.getElementById("time-total"); // Necesitaremos asignar ID si queremos actualizarlo
+    const timeTotalEl = document.getElementById("time-total"); // We will need to assign an ID if we want to update it
     if (timeTotalEl) timeTotalEl.textContent = `${dm}:${ds.toString().padStart(2, "0")}`;
   }
 };
@@ -75,15 +75,15 @@ engine.onEnded = () => {
 };
 
 function startTimer(): void {
-  // Ahora el progreso lo maneja onTimeUpdate al estar isPlaying = true
+  // Now progress is handled by onTimeUpdate when isPlaying = true
 }
 
 function stopTimer(): void {
-  // Manejado internamente
+  // Handled internally
 }
 
 function updateProgressUI(): void {
-  // Si no está reproduciendo nada real, reseteamos UI (o forzamos manualmente) o cuando se cambia la canción
+  // If not playing a real song, reset UI (or force manually) or when song changes
   const fill = document.getElementById("progress-fill") as HTMLElement;
   const timeEl = document.getElementById("time-current") as HTMLElement;
   if(progressSec === 0) {
@@ -92,7 +92,7 @@ function updateProgressUI(): void {
   }
 }
 
-// ── Sincronizar estado de efectos visuales ───────────────────
+// ── Synchronize visual effects state ─────────────────────────
 function syncVisualEffects(): void {
   barViz.playing = isPlaying;
   freqViz.playing = isPlaying;
@@ -101,7 +101,7 @@ function syncVisualEffects(): void {
   else document.body.classList.remove("is-playing");
 }
 
-// ── Controles de reproducción ────────────────────────────────
+// ── Playback controls ────────────────────────────────────────
 (window as any).togglePlay = (): void => {
   isPlaying = !isPlaying;
   const vinyl = document.getElementById("vinyl") as HTMLElement;
@@ -187,19 +187,19 @@ function syncVisualEffects(): void {
   const total = engine.getDuration();
   if (total && total !== Infinity) {
     engine.seek(pct * total);
-    // Actualizar visualmente al instante
+    // Update visually instantly
     const fill = document.getElementById("progress-fill") as HTMLElement;
     fill.style.width = (pct * 100) + "%";
   }
 };
 
-// ── Controles de volumen ─────────────────────────────────────
+// ── Volume controls ──────────────────────────────────────────
 (window as any).volumeUp = (): void => { vol.volumeUp(10); renderVol(); };
 (window as any).volumeDown = (): void => { vol.volumeDown(10); renderVol(); };
 (window as any).setVolume = (v: string): void => { vol.setVolume(parseInt(v)); renderVol(); };
 (window as any).toggleMute = (): void => { vol.toggleMute(); renderVol(); };
 
-// Enganchar el engine al volumen global (interceptando la respuesta de renderVol o directo)
+// Hook the engine to the global volume (intercepting renderVol response or direct)
 const autoSetVolume = () => { 
    engine.setVolume(vol.isMuted ? 0 : vol.rawVolume); 
 };
@@ -252,7 +252,7 @@ const autoSetVolume = () => {
     const titleInput = document.getElementById("f-title") as HTMLInputElement;
     const artistInput = document.getElementById("f-artist") as HTMLInputElement;
     
-    // Auto detectar formato "Artista - Titulo"
+    // Auto-detect "Artist - Title" format
     if (name.includes("-")) {
        const parts = name.split("-");
        if (!artistInput.value) artistInput.value = parts[0].trim();
@@ -275,7 +275,7 @@ function clearForm(): void {
   (document.getElementById("position-wrap") as HTMLElement).style.display = "none";
 }
 
-// ── Búsqueda y Filtros ───────────────────────────────────────
+// ── Search & Filters ─────────────────────────────────────────
 (window as any).onSearchInput = (e: Event): void => {
   searchFilter = (e.target as HTMLInputElement).value.toLowerCase();
   renderPlaylist();
@@ -296,7 +296,7 @@ function clearForm(): void {
   else btn?.classList.remove("active");
 };
 
-// ── Extracción de Color (Album Art) ──────────────────────────
+// ── Color Extraction (Album Art) ─────────────────────────────
 function extractTheme(file: File) {
   document.documentElement.style.setProperty("--accent", "#a78bfa"); // default
   jsmediatags.read(file, {
@@ -335,9 +335,9 @@ function rgbToHex(r: number, g: number, b: number) {
     return ((r << 16) | (g << 8) | b).toString(16);
 }
 
-// ── Atajos de Teclado y Drag & Drop ──────────────────────────
+// ── Keyboard Shortcuts and Drag & Drop ───────────────────────
 window.addEventListener("keydown", (e) => {
-  if (e.target instanceof HTMLInputElement) return; // No interferir con inputs
+  if (e.target instanceof HTMLInputElement) return; // Don't interfere with inputs
   if (e.code === "Space") { e.preventDefault(); (window as any).togglePlay(); }
   if (e.code === "ArrowRight") { e.preventDefault(); (window as any).nextSong(); }
   if (e.code === "ArrowLeft") { e.preventDefault(); (window as any).prevSong(); }
@@ -369,7 +369,7 @@ document.body.addEventListener("drop", (e) => {
   }
 });
 
-// ── Iconos de volumen ────────────────────────────────────────
+// ── Volume icons ─────────────────────────────────────────────
 const VOL_ICONS: Record<string, string> = {
   mute: `<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/></svg>`,
   low:  `<svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M7 9v6h4l5 5V4l-5 5H7z"/></svg>`,
@@ -386,7 +386,7 @@ function renderVol(): void {
   slider.value = String(vol.rawVolume);
   slider.style.setProperty("--val", vol.rawVolume + "%");
   
-  // Actualizar motor de audio
+  // Update audio engine
   engine.setVolume(vol.isMuted ? 0 : vol.rawVolume);
 }
 

@@ -1,7 +1,7 @@
 // src/visualizers/FrequencyVisualizer.ts
 //
-// Visualizador de espectro de frecuencias para el panel derecho.
-// Simula mayor energía en frecuencias bajas, con peak indicators.
+// Frequency spectrum visualizer for the right panel.
+// Simulates higher energy in low frequencies, with peak indicators.
 
 export class FrequencyVisualizer {
   private canvas: HTMLCanvasElement;
@@ -49,7 +49,7 @@ export class FrequencyVisualizer {
         const index = i * step + j;
         if (index < freqData.length) sum += freqData[index];
       }
-      return (sum / step) / 255.0; // Normalizar a 0-1
+      return (sum / step) / 255.0; // Normalize to 0-1
     });
   }
 
@@ -57,13 +57,13 @@ export class FrequencyVisualizer {
     this.resize();
     this.updateTargets();
 
-    // Suavizado exponencial
+    // Exponential smoothing
     this.data = this.data.map((v, i) => v + (this.targets[i] - v) * 0.12);
 
     const { width: w, height: h } = this.canvas;
     this.ctx.clearRect(0, 0, w, h);
 
-    // Fondo sutil cuando está activo
+    // Subtle background when active
     if (this._playing) {
       const grd = this.ctx.createLinearGradient(0, 0, w, 0);
       grd.addColorStop(0, "rgba(167,139,250,0.03)");
@@ -79,7 +79,7 @@ export class FrequencyVisualizer {
       const x = i * bw;
       const bh = Math.max(1, v * (h - 10));
       const y = h - bh;
-      const hue = 260 + i * 1.8; // violeta → rosa
+      const hue = 260 + i * 1.8; // violet → pink
 
       this.ctx.fillStyle = `hsla(${hue},80%,75%,${0.3 + v * 0.7})`;
       this.ctx.fillRect(x + 1, y, bw - 2, bh);
@@ -91,7 +91,7 @@ export class FrequencyVisualizer {
       }
     });
 
-    // Línea de base
+    // Baseline
     this.ctx.strokeStyle = "rgba(167,139,250,0.1)";
     this.ctx.lineWidth = 1;
     this.ctx.beginPath();

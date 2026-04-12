@@ -14,7 +14,7 @@ export class PlaylistService {
     this.dll = new DoublyLinkedList();
   }
 
-  // ── Helpers privados ────────────────────────────────────
+  // ── Private helpers ─────────────────────────────────────
   private generateId(): number {
     return this.idCounter++;
   }
@@ -23,7 +23,7 @@ export class PlaylistService {
     return { id: this.generateId(), title, artist, duration, audioUrl, file };
   }
 
-  // ── Agregar canciones ───────────────────────────────────
+  // ── Add songs ───────────────────────────────────────────
   addFirst(title: string, artist: string, duration: string, audioUrl?: string, file?: File): Song {
     const song = this.makeSong(title, artist, duration, audioUrl, file);
     this.dll.addFirst(song);
@@ -45,7 +45,7 @@ export class PlaylistService {
     return song;
   }
 
-  // ── Eliminar canción ────────────────────────────────────
+  // ── Remove song ─────────────────────────────────────────
   remove(id: number): boolean {
     if (this.currentNode?.data.id === id) {
       this.currentNode =
@@ -56,13 +56,13 @@ export class PlaylistService {
     return this.dll.removeById(id) !== null;
   }
 
-  // ── Navegación ──────────────────────────────────────────
+  // ── Navigation ──────────────────────────────────────────
   next(): boolean {
     if (this.currentNode?.next) {
       this.currentNode = this.currentNode.next;
       return true;
     }
-    // Ciclar al inicio si hay loop
+    // Loop back to start if loop active
     if (this.isLooping && this.dll.size > 0) {
       this.currentNode = this.dll.head;
       return true;
@@ -75,7 +75,7 @@ export class PlaylistService {
       this.currentNode = this.currentNode.prev;
       return true;
     }
-    // Ciclar al final si hay loop
+    // Loop back to end if loop active
     if (this.isLooping && this.dll.size > 0) {
       this.currentNode = this.dll.tail;
       return true;
@@ -116,7 +116,7 @@ export class PlaylistService {
     return this.dll.toArray();
   }
 
-  /** Canciones que vienen DESPUÉS de la actual (cola / up-next) */
+  /** Songs coming AFTER the current one (queue / up-next) */
   getUpNext(): Song[] {
     if (!this.currentNode?.next) return [];
     return this.dll.fromNode(this.currentNode.next);

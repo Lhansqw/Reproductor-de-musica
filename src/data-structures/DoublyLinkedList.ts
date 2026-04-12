@@ -21,7 +21,7 @@ export class DoublyLinkedList {
     return this._size;
   }
 
-  // ── Insertar al inicio ──────────────────────────────────
+  // ── Insert at beginning ─────────────────────────────────
   addFirst(song: Song): void {
     const node = new Node(song);
     if (!this.head) {
@@ -34,7 +34,7 @@ export class DoublyLinkedList {
     this._size++;
   }
 
-  // ── Insertar al final ───────────────────────────────────
+  // ── Insert at end ───────────────────────────────────────
   addLast(song: Song): void {
     const node = new Node(song);
     if (!this.tail) {
@@ -47,7 +47,7 @@ export class DoublyLinkedList {
     this._size++;
   }
 
-  // ── Insertar en posición específica (0-indexed) ─────────
+  // ── Insert at specific position (0-indexed) ─────────────
   addAt(song: Song, position: number): void {
     if (position <= 0) return this.addFirst(song);
     if (position >= this._size) return this.addLast(song);
@@ -65,7 +65,7 @@ export class DoublyLinkedList {
     this._size++;
   }
 
-  // ── Eliminar nodo por ID ────────────────────────────────
+  // ── Remove node by ID ───────────────────────────────────
   removeById(id: number): Node | null {
     let current = this.head;
     while (current) {
@@ -84,7 +84,7 @@ export class DoublyLinkedList {
     return null;
   }
 
-  // ── Buscar nodo por ID ──────────────────────────────────
+  // ── Find node by ID ─────────────────────────────────────
   findById(id: number): Node | null {
     let current = this.head;
     while (current) {
@@ -94,7 +94,7 @@ export class DoublyLinkedList {
     return null;
   }
 
-  // ── Exportar lista como array ───────────────────────────
+  // ── Export list as array ────────────────────────────────
   toArray(): Song[] {
     const result: Song[] = [];
     let current = this.head;
@@ -105,7 +105,7 @@ export class DoublyLinkedList {
     return result;
   }
 
-  // ── Recorrer hacia adelante desde un nodo dado ──────────
+  // ── Traverse forward from a given node ──────────────────
   fromNode(node: Node | null): Song[] {
     const result: Song[] = [];
     let current = node;
@@ -125,7 +125,7 @@ export class DoublyLinkedList {
       [items[i], items[j]] = [items[j], items[i]];
     }
     
-    // Reconstruir lista
+    // Rebuild list
     this.head = null;
     this.tail = null;
     this._size = 0;
