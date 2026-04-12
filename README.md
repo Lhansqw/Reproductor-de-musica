@@ -45,7 +45,7 @@ Para iniciar el proyecto en tu máquina de manera local asegúrate de tener `Nod
    npm run dev
    ```
 
-## 🛠️ Tecnologías Utilizadas
+##  Tecnologías Utilizadas
 
 * **HTML5 & Vanilla CSS**: Para toda la animación, UI semántica, y control visual en CSS variables usando Tailwind de manera sutil si se aplica conceptualmente.
 * **TypeScript**: Todo el encapsulamiento para clases fuertes, interfaces rígidas de la webAudioAPI, y prevención de colisiones.
