@@ -1,53 +1,98 @@
-#  MusicPlayer
+# 🎵 Taller Reproductor de Música — Listas Dobles
 
-Un reproductor de música moderno, interactivo y programado en **TypeScript**. Este proyecto comenzó como un taller sobre la estructura de datos **Lista Doblemente Enlazada (Doubly Linked List)** y ha evolucionado hacia una experiencia multimedia completa con diseño *Glassmorphism*, efectos visuales en tiempo real y múltiples características avanzadas.
+> **Taller Structures · TypeScript**  
+> Implementación de una Lista Doblemente Enlazada aplicada a un reproductor de música con Frontend interactivo.
+
+![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=flat-square&logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-B73BFE?style=flat-square&logo=vite&logoColor=white)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat-square&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
 
 ---
 
-##  Características Principales
+## 📋 Requerimientos del Taller
 
-* **Estructura de Datos Avanzada**: El manejo central de la playlist (agregar al inicio/final, insertar en posición o eliminar) y la navegación de pistas se administra puramente mediante una **Lista Doblemente Enlazada** creada desde cero en TypeScript.
-* **Aspecto Visual (Glassmorphism)**: Interfaz fluida, moderna y translúcida con temas estéticos pulidos (Gradients violeta y rosa).
-* **Color Adaptativo (ID3 Tags)**: Extrae automáticamente la portada del álbum de un archivo `.mp3` usando `jsmediatags` y adapta el tema de la aplicación (Color "Accent" y Auras) simulando el ecosistema del visualizador de manera dinámica.
-* **3 Visualizadores Interactivos en Tiempo Real**: Construidos puramente usando `Canvas API` y las frecuencias rítmicas del `AudioContext`:
-  * *BarVisualizer*: Simulador suavizado de frecuencias en el menú lateral.
-  * *FrequencyVisualizer*: Espectro completo de barras inferior con indicadores de pico.
-  * *ParticleSystem*: Partículas espaciales de fondo que reaccionan de manera elástica a los *bajos/bass* del audio.
-* **Controles Robustos de la Lista**: Buscar canciones en tiempo real, colas dinámicas (Up-Next), modo *Shuffle* automático para intercalar posiciones, y modo interactivo de repetición (Loop).
-* **Flujos de Trabajo Útiles**: Arrastra y suelta *(Drag & Drop)* múltiples archivos de audio directamente al reproductor o utiliza el formulario flotante con auto-detección del formato "Artista - Titulo".
-* **Atajos de Teclado**: Soporte para barra espaciadora (Play/Pause) y flechas direccionales (Siguiente, Anterior, Volumen).
+Este proyecto fue desarrollado aplicando los conceptos de **"listas dobles"** en TypeScript para simular una lista de reproducción de canciones. A continuación se detalla cómo se cumple cada requerimiento:
 
-##  Arquitectura del Proyecto
+| # | Requerimiento | Estado | Implementación |
+|---|---------------|--------|----------------|
+| 1 | Crear una app en **TypeScript** aplicando listas dobles | ✅ | `DoublyLinkedList.ts` + `PlaylistService.ts` |
+| 2 | **Frontend** donde el usuario pueda interactuar | ✅ | Interfaz Glassmorphism con HTML/CSS/TS |
+| 3 | Permitir **agregar** una canción al **inicio** | ✅ | `playlist.addFirst()` → botón modal "Inicio de la lista" |
+| 4 | Permitir **agregar** una canción al **final** | ✅ | `playlist.addLast()` → botón modal "Final de la lista" |
+| 5 | Permitir **agregar** una canción en **cualquier posición** | ✅ | `playlist.addAt(n)` → botón modal "Posición específica" |
+| 6 | Permitir **eliminar** una canción de la lista | ✅ | `playlist.remove(id)` → botón ✕ en cada canción |
+| 7 | Permitir **adelantar** canción | ✅ | `playlist.next()` → botón ⏭ y tecla `→` |
+| 8 | Permitir **retroceder** canción | ✅ | `playlist.prev()` → botón ⏮ y tecla `←` |
+| 9 | Otras funcionalidades pertinentes | ✅ | Ver sección de funciones extra ↓ |
 
-El código está estructurado en módulos bajo un entorno base en el compilador web **Vite**:
+---
 
-* `src/data-structures/`: Contiene la lógica profunda de algoritmos y listas enlazadas.
-* `src/models/`: Declaración de interfaces estáticas.
-* `src/services/`: Administración del motor de audio local, la lista de reproducción conectada a las vistas, y los controladores del estado del reproductor.
-* `src/visualizers/`: Clases del *Canvas API* que corren independientemente con `requestAnimationFrame`.
-* `src/main.ts`: Inyección de dependencias, unificación de *Event Listeners* y comunicación con la Interfaz (HTML/DOM).
+## ✨ Funcionalidades Extra
 
-##  Instalación y Ejecución
+Además de los requerimientos base, el proyecto incluye:
 
-Para iniciar el proyecto en tu máquina de manera local asegúrate de tener `Node.js` instalado:
+- 🎨 **Color Adaptativo** — Extrae la portada del álbum desde las etiquetas ID3 del archivo `.mp3` y adapta el tema de color de la interfaz dinámicamente.
+- 🔀 **Modo Shuffle** — Reorganiza aleatoriamente los nodos de la lista doblemente enlazada.
+- 🔁 **Modo Loop** — Al llegar al último nodo, regresa automáticamente a la cabeza de la lista.
+- 🔍 **Buscador en tiempo real** — Filtra canciones por título o artista.
+- 📋 **Cola de reproducción (Up-Next)** — Visualiza las canciones que siguen después de la actual.
+- 🎵 **Reproducción de audio real** — Soporte para archivos `.mp3` locales vía `AudioContext` del navegador.
+- 📁 **Drag & Drop** — Arrastra múltiples archivos de audio directamente al reproductor.
+- ⌨️ **Atajos de teclado** — `Espacio` (Play/Pause), `←` `→` (Anterior/Siguiente), `↑` `↓` (Volumen).
+- 📊 **3 Visualizadores de audio en Canvas** — Barras de frecuencia, espectro completo y sistema de partículas reactivo a los bajos.
 
-1. **Clonar el Repositorio** e ingresar al directorio.
-   ```bash
-   git clone https://github.com/Lhansqw/Reproductor-de-musica.git
-   cd Reproductor-de-musica
-   ```
-2. **Instalar Dependencias**
-   ```bash
-   npm install
-   ```
-3. **Ejecutar en modo Desarrollo (Vite)**
-   ```bash
-   npm run dev
-   ```
+---
+
+## 🗂️ Estructura del Proyecto
+
+```
+src/
+├── data-structures/
+│   └── DoublyLinkedList.ts   # Nodo y Lista Doblemente Enlazada (desde cero)
+├── models/
+│   └── Song.ts               # Interfaz/tipo de la canción
+├── services/
+│   ├── AudioEngine.ts        # Motor de audio (AudioContext + Web Audio API)
+│   ├── PlaylistService.ts    # Lógica de la playlist sobre la lista doble
+│   └── VolumeController.ts   # Control de volumen con estado mute/unmute
+├── visualizers/
+│   ├── BarVisualizer.ts      # Barras de frecuencia (sidebar)
+│   ├── FrequencyVisualizer.ts# Espectro completo de frecuencias
+│   └── ParticleSystem.ts     # Partículas reactivas a los bajos
+├── main.ts                   # Punto de entrada, event listeners y render
+└── style.css                 # Estilos Glassmorphism + animaciones
+```
+
+---
+
+## 🚀 Instalación y Ejecución
+
+Asegúrate de tener instalado [Node.js](https://nodejs.org/).
+
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/Lhansqw/Reproductor-de-musica.git
+cd Reproductor-de-musica
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Ejecutar en modo desarrollo
+npm run dev
+```
+
+Luego abre `http://localhost:5173` en tu navegador.
+
+---
 
 ## 🛠️ Tecnologías Utilizadas
 
-* **HTML5 & Vanilla CSS**: Para toda la animación, UI semántica, y control visual en CSS variables usando Tailwind de manera sutil si se aplica conceptualmente.
-* **TypeScript**: Todo el encapsulamiento para clases fuertes, interfaces rígidas de la webAudioAPI, y prevención de colisiones.
-* **Vite**: Bundler ultra-rápido de dependencias.
-* **jsmediatags**: Librería estática para procesar e inyectar el *ArtWork* oficial de las canciones locales en memoria `Blob` o Base64.
+| Tecnología | Uso |
+|------------|-----|
+| **TypeScript** | Lógica principal, tipos, clases, interfaces |
+| **HTML5 / CSS3** | Estructura y estilos Glassmorphism |
+| **Vite** | Bundler y servidor de desarrollo |
+| **Web Audio API** | Motor de audio y análisis de frecuencias |
+| **Canvas API** | Visualizadores gráficos en tiempo real |
+| **jsmediatags** | Lectura de etiquetas ID3 (título, artista, portada) |
