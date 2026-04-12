@@ -6,7 +6,8 @@ import { BarVisualizer } from "./visualizers/BarVisualizer";
 import { FrequencyVisualizer } from "./visualizers/FrequencyVisualizer";
 import { ParticleSystem } from "./visualizers/ParticleSystem";
 import { AudioEngine } from "./services/AudioEngine";
-import * as jsmediatags from "jsmediatags";
+// @ts-ignore: Missing types for the minified dist import
+import jsmediatags from "jsmediatags/dist/jsmediatags.min.js";
 
 let searchFilter = "";
 
@@ -299,7 +300,7 @@ function clearForm(): void {
 function extractTheme(file: File) {
   document.documentElement.style.setProperty("--accent", "#a78bfa"); // default
   jsmediatags.read(file, {
-    onSuccess: function(tag) {
+    onSuccess: function(tag: any) {
       const picture = tag.tags.picture;
       if (picture) {
         let base64String = "";
@@ -323,7 +324,7 @@ function extractTheme(file: File) {
         img.src = base64;
       }
     },
-    onError: function(error) {
+    onError: function(error: any) {
       console.warn("jsmediatags parsing fallback", error);
     }
   });
