@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🎵 Music Player — Listas Dobles v3</title>
+  <link rel="stylesheet" href="/src/style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- Orbs de luz ambiental -->
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Canvas partículas de fondo -->
+  <canvas id="bg-canvas"></canvas>
+
+  <!-- ======================= MODAL ======================= -->
+  <div class="modal-bg" id="modal-bg">
+    <div class="modal">
+      <div class="modal-top">
+        <span class="modal-title">Agregar canción</span>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div class="field">
+        <label>ARCHIVO DE AUDIO</label>
+        <div style="display:flex; gap:8px;">
+          <input id="f-file" type="file" accept="audio/*" style="flex:1" onchange="autoFillTitle(this)" />
+        </div>
+      </div>
+      <div class="field"><label>TÍTULO *</label><input id="f-title" type="text" placeholder="Nombre de la canción" /></div>
+      <div class="field"><label>ARTISTA *</label><input id="f-artist" type="text" placeholder="Nombre del artista" /></div>
+      <div class="field"><label>DURACIÓN</label><input id="f-duration" type="text" placeholder="3:45" /></div>
+      <div class="field">
+        <label>INSERTAR EN</label>
+        <select id="f-position" onchange="togglePosInput()">
+          <option value="end">Final de la lista</option>
+          <option value="start">Inicio de la lista</option>
+          <option value="at">Posición específica</option>
+        </select>
+      </div>
+      <div class="field" id="position-wrap">
+        <label>POSICIÓN (0 = inicio)</label>
+        <input id="f-pos-val" type="number" value="0" min="0" />
+      </div>
+      <div class="modal-actions">
+        <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+        <button class="btn-confirm" onclick="addSong()">+ Agregar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================= APP ========================= -->
+  <div class="app">
+
+    <!-- ── SIDEBAR IZQUIERDO ──────────────────────────── -->
+    <aside class="sidebar">
+
+      <div class="logo">
+        <div class="logo-gem">🎵</div>
+        <div>
+          <span class="logo-name">MusicPlayer</span>
+          <span class="logo-tag">LISTA DOBLE · TS</span>
+        </div>
+      </div>
+
+      <!-- Vinyl + Aura + Now Playing -->
+      <div class="vinyl-wrap">
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;">
+          <div class="vinyl-aura"></div>
+          <div class="vinyl" id="vinyl">
+            <div class="groove"></div><div class="groove"></div>
+            <div class="groove"></div><div class="groove"></div>
+            <div class="vinyl-dot"></div>
+            <div class="vinyl-center"></div>
+          </div>
+        </div>
+        <div class="np-info">
+          <span class="np-badge">
+            <span class="np-badge-dot"></span>
+            REPRODUCIENDO
+          </span>
+          <p class="np-title"  id="np-title">Sin canción</p>
+          <p class="np-artist" id="np-artist">—</p>
+        </div>
+      </div>
+
+      <!-- Barra de progreso -->
+      <div class="progress-wrap">
+        <div class="progress-track" id="progress-track" onclick="seekSong(event)" style="cursor: pointer;">
+          <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <div class="progress-times">
+          <span id="time-current">0:00</span>
+          <span id="time-total">3:30</span>
+        </div>
+      </div>
+
+      <!-- Controles de reproducción -->
+      <div class="controls">
+        <button class="ctrl" id="btn-shuffle" onclick="toggleShuffle()" title="Aleatorio (Shuffle)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M10.59 9.17L5.41 4 4 5.41l5.17 5.17 1.42-1.41zM14.5 4l2.04 2.04L4 18.59 5.41 20 17.96 7.46 20 9.5V4h-5.5zm.33 9.41l-1.41 1.41 3.13 3.13L14.5 20H20v-5.5l-2.04 2.04-3.13-3.13z"/></svg>
+        </button>
+        <button class="ctrl" onclick="prevSong()" title="Anterior">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+        </button>
+        <button class="ctrl-play" id="btn-play" onclick="togglePlay()">
+          <svg id="icon-play"  width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg>
+          <svg id="icon-pause" width="22" height="22" viewBox="0 0 24 24" fill="white" style="display:none"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+        </button>
+        <button class="ctrl" onclick="nextSong()" title="Siguiente">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M6 18l8.5-6L6 6v12zm2.5-6 5.5 3.9V8.1L8.5 12zM16 6h2v12h-2z"/></svg>
+        </button>
+        <button class="ctrl" id="btn-loop" onclick="toggleLoop()" title="Bucle (Loop)">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M7 7h10v3l4-4-4-4v3H5v6h2V7zm10 10H7v-3l-4 4 4 4v-3h12v-6h-2v4z"/></svg>
+        </button>
+      </div>
+
+      <!-- Control de Volumen -->
+      <div class="volume-block">
+        <div class="vol-header">
+          <span class="vol-label-text">VOLUMEN</span>
+          <span class="vol-value-badge" id="vol-label">70</span>
+        </div>
+        <div class="vol-row">
+          <button class="vol-icon-btn" id="vol-icon" onclick="toggleMute()" title="Mute"></button>
+          <input class="vol-slider" id="vol-slider" type="range" min="0" max="100" value="70" step="1"
+                 style="--val:70%" oninput="setVolume(this.value)" />
+          <button class="vol-btn" onclick="volumeDown()" title="Bajar">−</button>
+          <button class="vol-btn" onclick="volumeUp()"   title="Subir">+</button>
+        </div>
+      </div>
+
+
+
+      <!-- Visualizador de barras (sidebar) -->
+      <div class="viz-container">
+        <canvas id="viz-canvas"></canvas>
+      </div>
+
+    </aside>
+
+    <!-- ── PANEL CENTRAL: Playlist ───────────────────── -->
+    <main class="main">
+
+      <!-- Ondas de fondo SVG -->
+      <div class="wave-bg">
+        <svg viewBox="0 0 600 640" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="wg1" cx="50%" cy="50%" r="50%">
+              <stop offset="0%"   stop-color="rgba(167,139,250,0.04)"/>
+              <stop offset="100%" stop-color="rgba(167,139,250,0)"/>
+            </radialGradient>
+          </defs>
+          <ellipse cx="300" cy="320" rx="280" ry="250" fill="url(#wg1)">
+            <animate attributeName="rx" values="280;320;280" dur="4s" repeatCount="indefinite"/>
+            <animate attributeName="ry" values="250;290;250" dur="4s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.6;1;0.6" dur="4s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="300" cy="320" rx="200" ry="180" fill="none" stroke="rgba(167,139,250,0.06)" stroke-width="1">
+            <animate attributeName="rx" values="200;250;200" dur="5s" repeatCount="indefinite"/>
+            <animate attributeName="ry" values="180;220;180" dur="5s" repeatCount="indefinite"/>
+          </ellipse>
+          <ellipse cx="300" cy="320" rx="140" ry="120" fill="none" stroke="rgba(244,114,182,0.04)" stroke-width="1">
+            <animate attributeName="rx" values="140;170;140" dur="3.5s" repeatCount="indefinite"/>
+            <animate attributeName="ry" values="120;150;120" dur="3.5s" repeatCount="indefinite"/>
+          </ellipse>
+        </svg>
+      </div>
+
+      <div class="main-header">
+        <div>
+          <h1 class="main-title">Mi Playlist</h1>
+          <p class="main-subtitle">Taller — Listas Dobles · TypeScript</p>
+        </div>
+        <div style="display:flex; gap: 10px; align-items:center;">
+          <input type="search" id="search-input" class="search-bar" placeholder="Buscar Canción..." oninput="onSearchInput(event)" />
+          <button class="btn-add" onclick="openModal()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+            Agregar
+          </button>
+        </div>
+      </div>
+
+      <!-- Visualizador Principal insertado al tope de Playlist -->
+      <div class="freq-visualizer">
+        <canvas id="freq-canvas"></canvas>
+      </div>
+
+      <div class="col-headers">
+        <span style="text-align:center">#</span>
+        <span>CANCIÓN</span>
+        <span style="text-align:right">DUR.</span>
+        <span></span>
+      </div>
+
+      <div class="song-list" id="song-list"></div>
+
+      <!-- Cola de Reproducción dentro del panel principal -->
+      <div class="main-header" style="padding-top: 10px; padding-bottom: 5px;">
+        <div>
+          <h2 class="main-title" style="font-size: 1.1rem; opacity: 0.8;">Siguientes en cola</h2>
+        </div>
+      </div>
+      <div class="up-next-list" id="up-next-list" style="margin-bottom: 10px;"></div>
+
+    </main>
+
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
