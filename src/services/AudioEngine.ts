@@ -87,7 +87,7 @@ export class AudioEngine {
 
   public getFrequencyData(): Uint8Array {
     if (this.analyser && this.isPlaying) {
-      this.analyser.getByteFrequencyData(this.dataArray);
+      this.analyser.getByteFrequencyData(this.dataArray as any);
     } else if (this.dataArray.length > 0) {
       // If paused, gradually fill with zeros for a smooth fade (optional)
       // Or simply keep dataArray at its last value. 
@@ -99,7 +99,7 @@ export class AudioEngine {
 
   public getBassEnergy(): number {
     if (!this.analyser || !this.isPlaying) return 0;
-    this.analyser.getByteFrequencyData(this.dataArray);
+    this.analyser.getByteFrequencyData(this.dataArray as any);
     // Take the first bins (bass) to calculate energy
     let sum = 0;
     const bassBins = 4; // The first bins usually represent bass (<200Hz approx)
