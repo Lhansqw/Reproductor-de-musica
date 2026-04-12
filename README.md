@@ -1,21 +1,4 @@
-#  Taller Reproductor de Música — Listas Dobles
-
-##  Funcionalidades Extra
-
-Además de los requerimientos base, el proyecto incluye:
-
--  **Color Adaptativo** — Extrae la portada del álbum desde las etiquetas ID3 del archivo `.mp3` y adapta el tema de color de la interfaz dinámicamente.
--  **Modo Shuffle** — Reorganiza aleatoriamente los nodos de la lista doblemente enlazada.
--  **Modo Loop** — Al llegar al último nodo, regresa automáticamente a la cabeza de la lista.
--  **Buscador en tiempo real** — Filtra canciones por título o artista.
--  **Cola de reproducción (Up-Next)** — Visualiza las canciones que siguen después de la actual.
--  **Reproducción de audio real** — Soporte para archivos `.mp3` locales vía `AudioContext` del navegador.
--  **Drag & Drop** — Arrastra múltiples archivos de audio directamente al reproductor.
--  **Atajos de teclado** — `Espacio` (Play/Pause), `←` `→` (Anterior/Siguiente), `↑` `↓` (Volumen).
--  **3 Visualizadores de audio en Canvas** — Barras de frecuencia, espectro completo y sistema de partículas reactivo a los bajos.
-
----
-
+#  Taller Reproductor de Música — Listas Doble
 
 ##  Instalación y Ejecución
 
