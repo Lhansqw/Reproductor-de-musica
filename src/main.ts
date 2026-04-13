@@ -8,6 +8,7 @@ import { ParticleSystem } from "./visualizers/ParticleSystem";
 import { AudioEngine } from "./services/AudioEngine";
 // @ts-ignore: Missing types for the minified dist import
 import jsmediatags from "jsmediatags/dist/jsmediatags.min.js";
+import { FIXED_SONGS } from "./data/fixedSongs";
 
 let searchFilter = "";
 
@@ -31,20 +32,10 @@ let progressSec = 0;
 let timerId: ReturnType<typeof setInterval> | null = null;
 const MAX_SEC = 210;
 
-// ── Demo songs ───────────────────────────────────────────────
-const DEMO_URL_1 = "/demo1.mp3";
-const DEMO_URL_2 = "/demo2.mp3";
-const DEMO_URL_3 = "/demo3.mp3";
-const DEMO_URL_4 = "/The Weeknd - Blinding Lights (Official Audio).mp3";
-
-playlist.addLast("Blinding Lights (Local)", "The Weeknd", "3:23", DEMO_URL_4);
-playlist.addLast("Levitating (Demo 2)", "Dua Lipa", "7:05", DEMO_URL_2);
-playlist.addLast("Stay (Demo 3)", "The Kid LAROI", "5:44", DEMO_URL_3);
-playlist.addLast("Bad Guy", "Billie Eilish", "3:14");
-playlist.addLast("As It Was", "Harry Styles", "2:37");
-playlist.addLast("Heat Waves", "Glass Animals", "3:59");
-playlist.addLast("Flowers", "Miley Cyrus", "3:21");
-playlist.addLast("Unholy", "Sam Smith", "2:36");
+// ── Load Fixed Songs ─────────────────────────────────────────
+FIXED_SONGS.forEach(song => {
+  playlist.addLast(song.title, song.artist, song.duration, song.url);
+});
 
 // ── Timer / Progress ─────────────────────────────────────────
 engine.onTimeUpdate = (currentTime, duration) => {
@@ -118,7 +109,7 @@ function syncVisualEffects(): void {
        engine.setSrc(cur.audioUrl);
     }
     if (cur?.file) extractTheme(cur.file);
-    else document.documentElement.style.setProperty("--accent", "#a78bfa");
+    else document.documentElement.style.setProperty("--accent", "#ff007f");
     engine.play();
   } else {
     vinyl.classList.remove("spinning");
@@ -138,7 +129,7 @@ function syncVisualEffects(): void {
   if (cur?.audioUrl) engine.setSrc(cur.audioUrl);
   else engine.setSrc("");
   if (cur?.file) extractTheme(cur.file);
-  else document.documentElement.style.setProperty("--accent", "#a78bfa");
+  else document.documentElement.style.setProperty("--accent", "#ff007f");
   if (isPlaying) engine.play();
   renderAll();
 };
@@ -152,7 +143,7 @@ function syncVisualEffects(): void {
   if (cur?.audioUrl) engine.setSrc(cur.audioUrl);
   else engine.setSrc("");
   if (cur?.file) extractTheme(cur.file);
-  else document.documentElement.style.setProperty("--accent", "#a78bfa");
+  else document.documentElement.style.setProperty("--accent", "#ff007f");
   if (isPlaying) engine.play();
   renderAll();
 };
@@ -166,7 +157,7 @@ function syncVisualEffects(): void {
   if (cur?.audioUrl) engine.setSrc(cur.audioUrl);
   else engine.setSrc("");
   if (cur?.file) extractTheme(cur.file);
-  else document.documentElement.style.setProperty("--accent", "#a78bfa");
+  else document.documentElement.style.setProperty("--accent", "#ff007f");
   if (isPlaying) engine.play();
   renderAll();
 };
@@ -312,7 +303,7 @@ function clearForm(): void {
 
 // ── Color Extraction (Album Art) ─────────────────────────────
 function extractTheme(file: File) {
-  document.documentElement.style.setProperty("--accent", "#a78bfa"); // default
+  document.documentElement.style.setProperty("--accent", "#ff007f"); // default
   jsmediatags.read(file, {
     onSuccess: function(tag: any) {
       const picture = tag.tags.picture;

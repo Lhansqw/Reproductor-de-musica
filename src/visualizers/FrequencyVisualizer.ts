@@ -66,9 +66,9 @@ export class FrequencyVisualizer {
     // Subtle background when active
     if (this._playing) {
       const grd = this.ctx.createLinearGradient(0, 0, w, 0);
-      grd.addColorStop(0, "rgba(167,139,250,0.03)");
-      grd.addColorStop(0.5, "rgba(244,114,182,0.03)");
-      grd.addColorStop(1, "rgba(167,139,250,0.03)");
+      grd.addColorStop(0, "rgba(255,0,127,0.03)");
+      grd.addColorStop(0.5, "rgba(255,128,191,0.03)");
+      grd.addColorStop(1, "rgba(255,0,127,0.03)");
       this.ctx.fillStyle = grd;
       this.ctx.fillRect(0, 0, w, h);
     }
@@ -79,7 +79,7 @@ export class FrequencyVisualizer {
       const x = i * bw;
       const bh = Math.max(1, v * (h - 10));
       const y = h - bh;
-      const hue = 260 + i * 1.8; // violet → pink
+      const hue = 320 + i * 1.5; // Pink → Magenta
 
       this.ctx.fillStyle = `hsla(${hue},80%,75%,${0.3 + v * 0.7})`;
       this.ctx.fillRect(x + 1, y, bw - 2, bh);
@@ -92,7 +92,7 @@ export class FrequencyVisualizer {
     });
 
     // Baseline
-    this.ctx.strokeStyle = "rgba(167,139,250,0.1)";
+    this.ctx.strokeStyle = "rgba(255,0,127,0.1)";
     this.ctx.lineWidth = 1;
     this.ctx.beginPath();
     this.ctx.moveTo(0, h - 1);
