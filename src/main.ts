@@ -360,7 +360,7 @@ function renderDeezerResults(): void {
   list.innerHTML = currentDeezerResults.map(t => {
     const durStr = deezer.formatDuration(t.duration);
     return `
-    <div class="song-item" onclick="addDeezerSong(${t.id})">
+    <div class="song-item" data-id="${t.id}" data-type="deezer" onclick="addDeezerSong(${t.id})">
       <div class="song-num">
         <img src="${t.album.cover_medium}" style="width: 24px; height: 24px; border-radius: 4px;" />
       </div>
@@ -525,6 +525,7 @@ function renderPlaylist(): void {
       const playing = active && isPlaying;
       return `
       <div class="song-item ${active ? "active" : ""} ${playing ? "playing" : ""}"
+           data-id="${s.id}" data-type="local"
            onclick="selectSong(${s.id})">
         <div class="song-num">
           <span class="song-num-text">${active ? "♪" : i + 1}</span>
@@ -569,6 +570,90 @@ function renderAll(): void {
   renderUpNext();
   renderVol();
 }
+
+// ── Context Menu ───────────────────────────────────────────
+const ctxMenu = document.getElementById("context-menu") as HTMLElement;
+const ctxList = document.getElementById("context-menu-list") as HTMLElement;
+
+document.addEventListener("contextmenu", (e: MouseEvent) => {
+  const item = (e.target as HTMLElement).closest(".song-item") as HTMLElement;
+  if (!item) {
+    hideContextMenu();
+    return;
+  }
+  e.preventDefault();
+  
+  const id = parseInt(item.getAttribute("data-id") || "0");
+  const type = item.getAttribute("data-type");
+
+  showContextMenu(e.clientX, e.clientY, id, type || "local");
+});
+
+document.addEventListener("click", () => hideContextMenu());
+window.addEventListener("resize", () => hideContextMenu());
+
+function showContextMenu(x: number, y: number, id: number, type: string) {
+  ctxList.innerHTML = "";
+  
+  const items: { label: string, icon: string, action: () => void, class?: string }[] = [];
+
+  if (type === "deezer") {
+    items.push({ 
+      label: "Añadir a Playlist", icon: "➕", action: () => (window as any).saveDeezerToPlaylist(id) 
+    });
+    items.push({ 
+      label: "Reproducir Ahora", icon: "▶", action: () => (window as any).addDeezerSong(id) 
+    });
+  } else {
+    items.push({ 
+      label: "Reproducir Siguiente", icon: "⏭", action: () => { /* Logic could be added to DLL */ } 
+    });
+    items.push({ 
+      label: "Eliminar", icon: "🗑", class: "danger", action: () => (window as any).removeSong(id, new MouseEvent("click")) 
+    });
+  }
+
+  items.forEach(item => {
+    const li = document.createElement("li");
+    if (item.class) li.classList.add(item.class);
+    li.innerHTML = `<span class="menu-icon">${item.icon}</span> ${item.label}`;
+    li.onclick = (e) => {
+      e.stopPropagation();
+      item.action();
+      hideContextMenu();
+    };
+    ctxList.appendChild(li);
+  });
+
+  ctxMenu.style.display = "block";
+  
+  // Adjust position if it goes off screen
+  const menuWidth = ctxMenu.offsetWidth;
+  const menuHeight = ctxMenu.offsetHeight;
+  const screenWidth = window.innerWidth;
+  const screenHeight = window.innerHeight;
+
+  let finalX = x;
+  let finalY = y;
+
+  if (x + menuWidth > screenWidth) finalX = x - menuWidth;
+  if (y + menuHeight > screenHeight) finalY = y - menuHeight;
+
+  ctxMenu.style.left = `${finalX}px`;
+  ctxMenu.style.top = `${finalY}px`;
+}
+
+function hideContextMenu() {
+  ctxMenu.style.display = "none";
+}
+
+(window as any).saveDeezerToPlaylist = (trackId: number): void => {
+  const track = currentDeezerResults.find(t => t.id === trackId);
+  if (!track) return;
+  const durStr = deezer.formatDuration(track.duration);
+  playlist.addLast(track.title, track.artist.name, durStr, track.preview, undefined, track.album.cover_medium);
+  renderAll();
+};
 
 // ── Init ─────────────────────────────────────────────────────
 renderAll();

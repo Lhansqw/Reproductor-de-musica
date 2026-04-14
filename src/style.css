@@ -615,6 +615,60 @@ body.is-playing .viz-container { opacity: 1; }
   transform: scale(1.2);
 }
 
+/* Context Menu */
+.context-menu {
+  position: fixed;
+  z-index: 10000;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border2);
+  border-radius: 12px;
+  min-width: 180px;
+  box-shadow: 0 10px 30px rgba(255, 0, 127, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+  padding: 6px;
+  animation: contextFadeIn 0.15s ease-out;
+}
+
+@keyframes contextFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.context-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.context-menu li {
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+  transition: all 0.15s;
+}
+
+.context-menu li:hover {
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+}
+
+.context-menu li .menu-icon {
+  font-size: 1rem;
+  width: 18px;
+  text-align: center;
+}
+
+.context-menu li.danger:hover {
+  background: #ff4d4d;
+}
+
 /* ── Responsive ─────────────────────────────────────────────── */
 @media (max-width: 700px) {
   .player-bar { grid-template-columns: 1fr; grid-template-rows: auto auto auto; height: auto; padding: 12px 16px; gap: 10px; }
