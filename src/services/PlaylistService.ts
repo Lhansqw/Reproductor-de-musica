@@ -1,17 +1,16 @@
 // src/services/PlaylistService.ts
 
-import { DoublyLinkedList, Node } from "../data-structures/DoublyLinkedList";
 import { Song } from "../models/Song";
 
 export class PlaylistService {
-  private dll: DoublyLinkedList;
-  private currentNode: Node | null = null;
+  private songs: Song[] = [];
+  private currentIndex: number = -1;
   private idCounter: number = 1;
   public isLooping: boolean = true;
   public isShuffled: boolean = false;
 
   constructor() {
-    this.dll = new DoublyLinkedList();
+    // Empty
   }
 
   // ── Private helpers ─────────────────────────────────────
@@ -26,60 +25,91 @@ export class PlaylistService {
   // ── Add songs ───────────────────────────────────────────
   addFirst(title: string, artist: string, duration: string, audioUrl?: string, file?: File, albumArt?: string): Song {
     const song = this.makeSong(title, artist, duration, audioUrl, file, albumArt);
-    this.dll.addFirst(song);
-    if (!this.currentNode) this.currentNode = this.dll.head;
+    this.songs.unshift(song);
+    
+    // Update index if we added something before current
+    if (this.currentIndex >= 0) {
+      this.currentIndex++;
+    } else {
+      this.currentIndex = 0;
+    }
     return song;
   }
 
   addLast(title: string, artist: string, duration: string, audioUrl?: string, file?: File, albumArt?: string): Song {
     const song = this.makeSong(title, artist, duration, audioUrl, file, albumArt);
-    this.dll.addLast(song);
-    if (!this.currentNode) this.currentNode = this.dll.head;
+    this.songs.push(song);
+    if (this.currentIndex === -1) this.currentIndex = 0;
     return song;
   }
 
   addAt(title: string, artist: string, duration: string, position: number, audioUrl?: string, file?: File, albumArt?: string): Song {
     const song = this.makeSong(title, artist, duration, audioUrl, file, albumArt);
-    this.dll.addAt(song, position);
-    if (!this.currentNode) this.currentNode = this.dll.head;
+    const pos = Math.max(0, Math.min(position, this.songs.length));
+    
+    this.songs.splice(pos, 0, song);
+    
+    // Update index if inserted before or at current
+    if (this.currentIndex >= pos) {
+      this.currentIndex++;
+    } else if (this.currentIndex === -1) {
+      this.currentIndex = 0;
+    }
     return song;
   }
 
   // ── Remove song ─────────────────────────────────────────
   remove(id: number): boolean {
-    if (this.currentNode?.data.id === id) {
-      this.currentNode =
-        this.currentNode.next ??
-        this.currentNode.prev ??
-        null;
+    const index = this.songs.findIndex(s => s.id === id);
+    if (index === -1) return false;
+
+    this.songs.splice(index, 1);
+
+    // Adjust currentIndex
+    if (this.songs.length === 0) {
+      this.currentIndex = -1;
+    } else if (this.currentIndex === index) {
+      // Current was removed, stay at same index (next song) or wrap
+      if (this.currentIndex >= this.songs.length) {
+        this.currentIndex = 0;
+      }
+    } else if (this.currentIndex > index) {
+      this.currentIndex--;
     }
-    return this.dll.removeById(id) !== null;
+
+    return true;
   }
 
   // ── Navigation ──────────────────────────────────────────
   next(): boolean {
-    if (this.currentNode?.next) {
-      this.currentNode = this.currentNode.next;
+    if (this.songs.length === 0) return false;
+
+    if (this.currentIndex < this.songs.length - 1) {
+      this.currentIndex++;
       return true;
     }
-    // Loop back to start if loop active
-    if (this.isLooping && this.dll.size > 0) {
-      this.currentNode = this.dll.head;
+    
+    if (this.isLooping) {
+      this.currentIndex = 0;
       return true;
     }
+    
     return false;
   }
 
   prev(): boolean {
-    if (this.currentNode?.prev) {
-      this.currentNode = this.currentNode.prev;
+    if (this.songs.length === 0) return false;
+
+    if (this.currentIndex > 0) {
+      this.currentIndex--;
       return true;
     }
-    // Loop back to end if loop active
-    if (this.isLooping && this.dll.size > 0) {
-      this.currentNode = this.dll.tail;
+    
+    if (this.isLooping) {
+      this.currentIndex = this.songs.length - 1;
       return true;
     }
+    
     return false;
   }
 
@@ -89,9 +119,15 @@ export class PlaylistService {
 
   toggleShuffle(): void {
     this.isShuffled = !this.isShuffled;
-    if (this.isShuffled) {
+    if (this.isShuffled && this.songs.length > 1) {
       const currentId = this.getCurrent()?.id;
-      this.dll.shuffle();
+      
+      // Fisher-Yates shuffle
+      for (let i = this.songs.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [this.songs[i], this.songs[j]] = [this.songs[j], this.songs[i]];
+      }
+
       if (currentId !== undefined) {
         this.selectById(currentId);
       }
@@ -99,9 +135,9 @@ export class PlaylistService {
   }
 
   selectById(id: number): boolean {
-    const node = this.dll.findById(id);
-    if (node) {
-      this.currentNode = node;
+    const index = this.songs.findIndex(s => s.id === id);
+    if (index !== -1) {
+      this.currentIndex = index;
       return true;
     }
     return false;
@@ -109,45 +145,53 @@ export class PlaylistService {
 
   // ── Getters ─────────────────────────────────────────────
   getCurrent(): Song | null {
-    return this.currentNode?.data ?? null;
+    if (this.currentIndex < 0 || this.currentIndex >= this.songs.length) return null;
+    return this.songs[this.currentIndex];
   }
 
   getAll(): Song[] {
-    return this.dll.toArray();
+    return [...this.songs];
   }
 
   /** Songs coming AFTER the current one (queue / up-next) */
   getUpNext(): Song[] {
-    if (!this.currentNode) return [];
+    if (this.currentIndex === -1 || this.songs.length === 0) return [];
     
-    const all = this.dll.toArray();
-    const currentIndex = all.findIndex(s => s.id === this.currentNode?.data.id);
-    if (currentIndex === -1) return [];
-
     let upcoming: Song[] = [];
 
     if (this.isLooping) {
       // If looping, we take what's after current + what's at the start
-      const after = all.slice(currentIndex + 1);
-      const before = all.slice(0, currentIndex);
+      const after = this.songs.slice(this.currentIndex + 1);
+      const before = this.songs.slice(0, this.currentIndex);
       upcoming = [...after, ...before];
     } else {
-      upcoming = all.slice(currentIndex + 1);
+      upcoming = this.songs.slice(this.currentIndex + 1);
     }
 
-    // Limit to 10 songs to keep the UI clean
     return upcoming.slice(0, 10);
   }
 
   get size(): number {
-    return this.dll.size;
+    return this.songs.length;
   }
 
   getPrevTitle(): string {
-    return this.currentNode?.prev?.data?.title ?? "null";
+    if (this.currentIndex <= 0) {
+      if (this.isLooping && this.songs.length > 0) {
+        return this.songs[this.songs.length - 1].title;
+      }
+      return "null";
+    }
+    return this.songs[this.currentIndex - 1].title;
   }
 
   getNextTitle(): string {
-    return this.currentNode?.next?.data?.title ?? "null";
+    if (this.currentIndex === -1 || this.currentIndex >= this.songs.length - 1) {
+      if (this.isLooping && this.songs.length > 0) {
+        return this.songs[0].title;
+      }
+      return "null";
+    }
+    return this.songs[this.currentIndex + 1].title;
   }
-}
+}
