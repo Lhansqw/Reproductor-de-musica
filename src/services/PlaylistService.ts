@@ -19,27 +19,27 @@ export class PlaylistService {
     return this.idCounter++;
   }
 
-  private makeSong(title: string, artist: string, duration: string, audioUrl?: string, file?: File): Song {
-    return { id: this.generateId(), title, artist, duration, audioUrl, file };
+  private makeSong(title: string, artist: string, duration: string, audioUrl?: string, file?: File, albumArt?: string): Song {
+    return { id: this.generateId(), title, artist, duration, audioUrl, file, albumArt };
   }
 
   // ── Add songs ───────────────────────────────────────────
-  addFirst(title: string, artist: string, duration: string, audioUrl?: string, file?: File): Song {
-    const song = this.makeSong(title, artist, duration, audioUrl, file);
+  addFirst(title: string, artist: string, duration: string, audioUrl?: string, file?: File, albumArt?: string): Song {
+    const song = this.makeSong(title, artist, duration, audioUrl, file, albumArt);
     this.dll.addFirst(song);
     if (!this.currentNode) this.currentNode = this.dll.head;
     return song;
   }
 
-  addLast(title: string, artist: string, duration: string, audioUrl?: string, file?: File): Song {
-    const song = this.makeSong(title, artist, duration, audioUrl, file);
+  addLast(title: string, artist: string, duration: string, audioUrl?: string, file?: File, albumArt?: string): Song {
+    const song = this.makeSong(title, artist, duration, audioUrl, file, albumArt);
     this.dll.addLast(song);
     if (!this.currentNode) this.currentNode = this.dll.head;
     return song;
   }
 
-  addAt(title: string, artist: string, duration: string, position: number, audioUrl?: string, file?: File): Song {
-    const song = this.makeSong(title, artist, duration, audioUrl, file);
+  addAt(title: string, artist: string, duration: string, position: number, audioUrl?: string, file?: File, albumArt?: string): Song {
+    const song = this.makeSong(title, artist, duration, audioUrl, file, albumArt);
     this.dll.addAt(song, position);
     if (!this.currentNode) this.currentNode = this.dll.head;
     return song;

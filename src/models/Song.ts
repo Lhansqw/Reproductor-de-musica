@@ -7,4 +7,5 @@ export interface Song {
   duration: string; // duration format "m:ss"
   audioUrl?: string; // Real audio file URL
   file?: File; // Real instance for extracting ID3
+  albumArt?: string; // Album cover URL (e.g. from Deezer)
 }

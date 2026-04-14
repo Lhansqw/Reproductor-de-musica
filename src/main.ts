@@ -9,12 +9,16 @@ import { AudioEngine } from "./services/AudioEngine";
 // @ts-ignore: Missing types for the minified dist import
 import jsmediatags from "jsmediatags/dist/jsmediatags.min.js";
 import { FIXED_SONGS } from "./data/fixedSongs";
+import { DeezerService, DeezerTrack } from "./services/DeezerService";
 
 let searchFilter = "";
 
 // ── Service instances ────────────────────────────────────────
 const playlist = new PlaylistService();
 const vol = new VolumeController(70);
+const deezer = new DeezerService();
+
+let currentDeezerResults: DeezerTrack[] = [];
 
 // ── Visualizers ──────────────────────────────────────────────
 const barViz = new BarVisualizer("viz-canvas", 28);
@@ -109,7 +113,10 @@ function syncVisualEffects(): void {
        engine.setSrc(cur.audioUrl);
     }
     if (cur?.file) extractTheme(cur.file);
+    else if (cur?.albumArt) updateThemeFromUrl(cur.albumArt);
     else document.documentElement.style.setProperty("--accent", "#ff007f");
+    
+    updateVinylArt(cur?.albumArt);
     engine.play();
   } else {
     vinyl.classList.remove("spinning");
@@ -129,7 +136,10 @@ function syncVisualEffects(): void {
   if (cur?.audioUrl) engine.setSrc(cur.audioUrl);
   else engine.setSrc("");
   if (cur?.file) extractTheme(cur.file);
+  else if (cur?.albumArt) updateThemeFromUrl(cur.albumArt);
   else document.documentElement.style.setProperty("--accent", "#ff007f");
+  
+  updateVinylArt(cur?.albumArt);
   if (isPlaying) engine.play();
   renderAll();
 };
@@ -143,7 +153,10 @@ function syncVisualEffects(): void {
   if (cur?.audioUrl) engine.setSrc(cur.audioUrl);
   else engine.setSrc("");
   if (cur?.file) extractTheme(cur.file);
+  else if (cur?.albumArt) updateThemeFromUrl(cur.albumArt);
   else document.documentElement.style.setProperty("--accent", "#ff007f");
+  
+  updateVinylArt(cur?.albumArt);
   if (isPlaying) engine.play();
   renderAll();
 };
@@ -157,7 +170,10 @@ function syncVisualEffects(): void {
   if (cur?.audioUrl) engine.setSrc(cur.audioUrl);
   else engine.setSrc("");
   if (cur?.file) extractTheme(cur.file);
+  else if (cur?.albumArt) updateThemeFromUrl(cur.albumArt);
   else document.documentElement.style.setProperty("--accent", "#ff007f");
+  
+  updateVinylArt(cur?.albumArt);
   if (isPlaying) engine.play();
   renderAll();
 };
@@ -301,6 +317,63 @@ function clearForm(): void {
   else btn?.classList.remove("active");
 };
 
+// ── Deezer Integration ───────────────────────────────────────
+(window as any).searchDeezer = async (): Promise<void> => {
+  const input = document.getElementById("deezer-input") as HTMLInputElement;
+  const query = input.value.trim();
+  if (!query) return;
+
+  const btn = document.querySelector(".btn-deezer") as HTMLElement;
+  btn.textContent = "⏳";
+
+  currentDeezerResults = await deezer.search(query);
+  btn.textContent = "🌍";
+
+  const container = document.getElementById("deezer-results-container") as HTMLElement;
+  if (currentDeezerResults.length > 0) {
+    container.style.display = "flex";
+  } else {
+    container.style.display = "none";
+  }
+  renderDeezerResults();
+};
+
+(window as any).addDeezerSong = (trackId: number): void => {
+  const track = currentDeezerResults.find(t => t.id === trackId);
+  if (!track) return;
+
+  const durStr = deezer.formatDuration(track.duration);
+  const song = playlist.addLast(track.title, track.artist.name, durStr, track.preview, undefined, track.album.cover_medium);
+  
+  // Optionally select it immediately
+  (window as any).selectSong(song.id);
+  renderAll();
+};
+
+function renderDeezerResults(): void {
+  const list = document.getElementById("deezer-list") as HTMLElement;
+  if (!currentDeezerResults.length) {
+    list.innerHTML = `<p class="un-empty">No se encontraron resultados</p>`;
+    return;
+  }
+
+  list.innerHTML = currentDeezerResults.map(t => {
+    const durStr = deezer.formatDuration(t.duration);
+    return `
+    <div class="song-item" onclick="addDeezerSong(${t.id})">
+      <div class="song-num">
+        <img src="${t.album.cover_medium}" style="width: 24px; height: 24px; border-radius: 4px;" />
+      </div>
+      <div class="song-info">
+        <div class="song-title-text">${t.title}</div>
+        <div class="song-artist-text">${t.artist.name} — ${t.album.title}</div>
+      </div>
+      <div class="song-dur">${durStr}</div>
+      <div class="song-num">+</div>
+    </div>`;
+  }).join("");
+}
+
 // ── Color Extraction (Album Art) ─────────────────────────────
 function extractTheme(file: File) {
   document.documentElement.style.setProperty("--accent", "#ff007f"); // default
@@ -338,6 +411,34 @@ function extractTheme(file: File) {
 function rgbToHex(r: number, g: number, b: number) {
     if (r > 255 || g > 255 || b > 255) throw "Invalid color component";
     return ((r << 16) | (g << 8) | b).toString(16);
+}
+
+function updateThemeFromUrl(url: string) {
+  const img = new Image();
+  img.crossOrigin = "Anonymous";
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 1; canvas.height = 1;
+    const ctx = canvas.getContext("2d");
+    if (ctx) {
+      ctx.drawImage(img, 0, 0, 1, 1);
+      const p = ctx.getImageData(0, 0, 1, 1).data;
+      const hex = "#" + ("000000" + rgbToHex(p[0], p[1], p[2])).slice(-6);
+      document.documentElement.style.setProperty("--accent", hex);
+    }
+  };
+  img.src = url;
+}
+
+function updateVinylArt(url?: string) {
+  const center = document.getElementById("vinyl-center") as HTMLElement;
+  if (url) {
+    center.style.backgroundImage = `url(${url})`;
+    center.classList.add("has-art");
+  } else {
+    center.style.backgroundImage = "none";
+    center.classList.remove("has-art");
+  }
 }
 
 // ── Keyboard Shortcuts and Drag & Drop ───────────────────────

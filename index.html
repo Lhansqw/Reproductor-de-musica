@@ -84,7 +84,11 @@
           <span class="logo-name">PinkPlayer</span>
         </div>
         <div style="display:flex; gap:10px; align-items:center;">
-          <input type="search" id="search-input" class="search-bar" placeholder="Buscar canción..." oninput="onSearchInput(event)" />
+          <input type="search" id="search-input" class="search-bar" placeholder="Filtrar playlist..." oninput="onSearchInput(event)" />
+          <div class="deezer-search-wrap">
+            <input type="search" id="deezer-input" class="search-bar global-search" placeholder="Buscador Deezer..." onkeydown="if(event.key === 'Enter') (window as any).searchDeezer()" />
+            <button class="btn-deezer" onclick="searchDeezer()" title="Buscar en Deezer">🌍</button>
+          </div>
           <button class="btn-add" onclick="openModal()">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
             Agregar
@@ -95,6 +99,7 @@
       <div class="main-layout">
         <!-- Left Column: Library -->
         <div class="library-panel">
+          <div class="section-title">Mi Playlist Local</div>
           <div class="col-headers">
             <span style="text-align:center">#</span>
             <span>CANCIÓN</span>
@@ -102,6 +107,12 @@
             <span></span>
           </div>
           <div class="song-list" id="song-list"></div>
+
+          <!-- Deezer Results -->
+          <div id="deezer-results-container" style="display:none; flex-direction: column; border-top: 1px solid var(--border2); padding-top: 10px;">
+            <div class="section-title">Resultados Deezer 🌍</div>
+            <div class="song-list" id="deezer-list"></div>
+          </div>
         </div>
 
         <!-- Right Column: Queue & Stats -->
@@ -133,7 +144,7 @@
             <div class="groove"></div><div class="groove"></div>
             <div class="groove"></div><div class="groove"></div>
             <div class="vinyl-dot"></div>
-            <div class="vinyl-center"></div>
+            <div class="vinyl-center" id="vinyl-center"></div>
           </div>
         </div>
         <div class="np-info">
