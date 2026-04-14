@@ -92,27 +92,33 @@
         </div>
       </div>
 
-      <!-- Main Visualizer -->
-      <div class="freq-visualizer">
-        <canvas id="freq-canvas"></canvas>
-      </div>
+      <div class="main-layout">
+        <!-- Left Column: Library -->
+        <div class="library-panel">
+          <div class="col-headers">
+            <span style="text-align:center">#</span>
+            <span>CANCIÓN</span>
+            <span style="text-align:right">DUR.</span>
+            <span></span>
+          </div>
+          <div class="song-list" id="song-list"></div>
+        </div>
 
-      <div class="col-headers">
-        <span style="text-align:center">#</span>
-        <span>CANCIÓN</span>
-        <span style="text-align:right">DUR.</span>
-        <span></span>
-      </div>
+        <!-- Right Column: Queue & Stats -->
+        <div class="queue-panel">
+          <!-- Main Visualizer moved here -->
+          <div class="freq-visualizer">
+            <canvas id="freq-canvas"></canvas>
+          </div>
 
-      <div class="song-list" id="song-list"></div>
-
-      <!-- Up Next Queue -->
-      <div class="main-header" style="padding-top:10px; padding-bottom:5px;">
-        <div>
-          <h2 class="main-title" style="font-size:1.1rem; opacity:0.8;">Siguientes en cola</h2>
+          <div class="queue-section-header">
+            <h2 class="queue-title">Siguientes en cola</h2>
+            <span class="queue-subtitle">Próximas pistas</span>
+          </div>
+          
+          <div class="up-next-list" id="up-next-list"></div>
         </div>
       </div>
-      <div class="up-next-list" id="up-next-list" style="margin-bottom:10px;"></div>
 
     </main>
 

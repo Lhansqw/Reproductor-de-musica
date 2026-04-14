@@ -118,8 +118,25 @@ export class PlaylistService {
 
   /** Songs coming AFTER the current one (queue / up-next) */
   getUpNext(): Song[] {
-    if (!this.currentNode?.next) return [];
-    return this.dll.fromNode(this.currentNode.next);
+    if (!this.currentNode) return [];
+    
+    const all = this.dll.toArray();
+    const currentIndex = all.findIndex(s => s.id === this.currentNode?.data.id);
+    if (currentIndex === -1) return [];
+
+    let upcoming: Song[] = [];
+
+    if (this.isLooping) {
+      // If looping, we take what's after current + what's at the start
+      const after = all.slice(currentIndex + 1);
+      const before = all.slice(0, currentIndex);
+      upcoming = [...after, ...before];
+    } else {
+      upcoming = all.slice(currentIndex + 1);
+    }
+
+    // Limit to 10 songs to keep the UI clean
+    return upcoming.slice(0, 10);
   }
 
   get size(): number {
